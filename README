@@ -1,0 +1,16 @@
+Archonix Boobie Board Toys
+==========================
+
+Lua-based hardware controller for the Archonix Boobie Board.
+
+- CPU idle monitor (cpuidle.lua)
+-
+
+Platform:
+- Built on Ubuntu 11.04
+
+Requires:
+- Boobie Board - available from www.archonix.co.uk
+- lua
+- systat
+- a good editor, vi is *always* the right weapon of choice.

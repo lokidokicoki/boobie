@@ -46,27 +46,43 @@ function getData()
 	end
 end
 
-if arg[1] ~= nil then
-	rate=arg[1]
+function main()
+	if arg[1] ~= nil then
+		rate=arg[1]
+	end
+
+	if arg[2] ~= nil then
+		samples=arg[2]
+	end
+
+	if arg[3] ~= nil then
+		interval=arg[3]
+	end
+
+	print("Settings: rate["..rate.."], samples["..samples.."], interval["..interval.."])")
+
+	serial.connect()
+
+	local loop=true 
+	while(loop) do
+		getData()
+		sleep(interval)
+	end
+
+	serial.close()
+
 end
 
-if arg[2] ~= nil then
-	samples=arg[2]
-	samples=samples+1
+function usage()
+	print("Usage: lua cpuidle.lua [-h|rate] [samples] [interval]")
+	print("-h|--help : print this message then exit")
+	print("rate : interval between calls to iostat (default is 1)")
+	print("samples : number of sample to average cpu idle over (default is 2)")
+	print("interval : number of second to wait before sampling again (default is 1)")
 end
 
-if arg[3] ~= nil then
-	interval=arg[3]
+if arg[1] ~= nil and arg[1] == "-h" or "--help" then 
+	usage()
+else
+	main() 
 end
-
-print("Settings: rate["..rate.."], samples["..samples.."], interval["..interval.."])")
-
-serial.connect()
-
-local loop=true
-while(loop) do
-	getData()
-	sleep(interval)
-end
-
-serial.close()
