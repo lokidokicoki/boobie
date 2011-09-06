@@ -81,7 +81,7 @@ function usage()
 	print("interval : number of second to wait before sampling again (default is 1)")
 end
 
-if arg[1] ~= nil and arg[1] == "-h" or "--help" then 
+if arg[1] ~= nil and (arg[1] == "-h" or arg[1] == "--help") then 
 	usage()
 else
 	main() 
