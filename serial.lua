@@ -10,6 +10,7 @@ local wserial = nil
 local rserial = nil
 
 local linetime = 0.1
+debug=true
 
 -- ******************************************************************
 
@@ -57,7 +58,7 @@ function write(command, port, value)
 	else
 		outstring = command .. "\r"
 	end
-	print(outstring)
+	if debug then print(outstring) end
 	wserial:write(outstring)
 	wserial:flush()
 	sleep(linetime)
