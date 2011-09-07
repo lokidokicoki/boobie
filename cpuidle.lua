@@ -1,15 +1,17 @@
 require 'serial'
 -- boobie has 7 leds
-local max_led=7
+local max_leds=7
 local rate=1
 local samples=1
 local interval=0.1
+local curr_leds=0
+local prev_leds=0
 
 function sleep(n)
     os.execute("sleep "..tonumber(n))
 end
 
-function getData()
+function process()
     os.execute("iostat -c "..rate.." ".. samples + 1 .." > /tmp/cpuidle");
     local count=0
     local idle=0
@@ -29,12 +31,22 @@ function getData()
     end
 
     idle = 100-(idle/samples)
-    local num_leds = math.ceil(math.floor((max_led/100)*idle))
-    --print('actual idle:'..idle..', num_leds:'..num_leds)
-    for i=1,max_led,1 do
+    curr_leds = math.ceil(math.floor((max_leds/100)*idle))
+    if curr_leds ~= prev_leds then
+	--print('actual idle:'..idle..', curr_leds:'..curr_leds)
+	for i=1,max_leds,1 do
+	    local pin = i+8
+	    local value = 1 --off
+	    if i <= curr_leds then value=0 end
+	    serial.write('w',pin,value)
+	end
+	prev_leds=curr_leds
+    end
+end
+function shut_down()
+    for i=1,max_leds,1 do
 	local pin = i+8
 	local value = 1 --off
-	if i <= num_leds then value=0 end
 	serial.write('w',pin,value)
     end
 end
@@ -52,15 +64,22 @@ function main()
 	interval=arg[3]
     end
 
-    --print("Settings: rate["..rate.."], samples["..samples.."], interval["..interval.."])")
+    print("Settings: rate["..rate.."], samples["..samples.."], interval["..interval.."])")
 
     serial.debug=false
     serial.connect()
+    serial.setport()
 
     local loop=true 
     while(loop) do
-	getData()
+	process()
 	sleep(interval)
+	if io.open("CPUIDLEPIPE", "r") ~= nil then 
+	    for line in io.lines("CPUIDLEPIPE") do 
+		if line == "stop" then loop = false end
+		shut_down()
+	    end
+	end
     end
 
     serial.close()
