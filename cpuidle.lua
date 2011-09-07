@@ -4,7 +4,7 @@ local max_leds=7
 local rate=1
 local samples=1
 local interval=0.1
-local curr_leds=0
+local curr_leds=-1
 local prev_leds=0
 
 function sleep(n)
@@ -43,10 +43,10 @@ function process()
 	prev_leds=curr_leds
     end
 end
-function shut_down()
+
+function pulse(value)
     for i=1,max_leds,1 do
 	local pin = i+8
-	local value = 1 --off
 	serial.write('w',pin,value)
     end
 end
@@ -68,7 +68,7 @@ function main()
 
     serial.debug=false
     serial.connect()
-    serial.setport()
+    pulse(0)
 
     local loop=true 
     while(loop) do
@@ -77,11 +77,11 @@ function main()
 	if io.open("CPUIDLEPIPE", "r") ~= nil then 
 	    for line in io.lines("CPUIDLEPIPE") do 
 		if line == "stop" then loop = false end
-		shut_down()
 	    end
 	end
     end
 
+    pulse(1)
     serial.close()
 
 end
