@@ -4,6 +4,7 @@ local portdirection	={1,1,1,1,1,1,1,1,1,1,1,1}
 local portvalue	={0,0,0,0,0,0,0,0,0,0,0,0}
 local portconfiguration={}
 local serialports={"/dev/ttyUSB0","/dev/ttyUSB1","/dev/ttyUSB2","/dev/ttyUSB3","/dev/ttyUSB4","/dev/ttyUSB5","/dev/ttyUSB6","/dev/ttyUSB7","/dev/ttyUSB8"}
+local currentport=nil
 local maxport= 9
 
 local wserial = nil
@@ -40,15 +41,29 @@ function connect(specificport)
 				counter = 0
 			end
 		end
+		currentport = serialports[counter]
 
 		if webmode == nil then
-			print("Using " .. serialports[counter])
+			print("Using " .. currentport)
 		end
-		os.execute("stty -F " .. serialports[counter] .. " 57600")
+		os.execute("stty -F " .. currentport .. " 57600")
 	else
+		currentport=specificport
 		wserial=io.open(specificport,"w")
 		os.execute("stty -F " .. specificport .. " 57600")
 	end
+	return currentport
+end
+
+function checkport()
+    local port = io.open(currentport, "w")
+    if not port then
+	print('port died, reconnecting...')
+	close()
+	connect()
+    else
+	io.close(port)
+    end
 end
 
 function write(command, port, value)
@@ -75,8 +90,9 @@ function setport()
 end
 
 function close()
-	if wserial then wserial:close() end
-	if rserial then rserial:close() end
+	if wserial then wserial:close(); wserial=nil; end
+	if rserial then rserial:close(); rserial=nil; end
+	sleep(linetime)
 end
 
 function setup()

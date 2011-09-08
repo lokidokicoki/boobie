@@ -74,6 +74,7 @@ function main()
     while(loop) do
 	process()
 	sleep(interval)
+	serial.checkport()
 	if io.open("CPUIDLEPIPE", "r") ~= nil then 
 	    for line in io.lines("CPUIDLEPIPE") do 
 		if line == "stop" then loop = false end
