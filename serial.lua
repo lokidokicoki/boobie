@@ -10,8 +10,9 @@ local maxport= 9
 local wserial = nil
 local rserial = nil
 
-local linetime = 0.1
-debug=true
+local linetime = 0.2
+debug=false
+simulate=false
 
 -- ******************************************************************
 
@@ -28,6 +29,7 @@ end
 ]]
 
 function connect(specificport)
+    if not simulate then
 	local received = nil
 	local counter=0
 
@@ -53,17 +55,24 @@ function connect(specificport)
 		os.execute("stty -F " .. specificport .. " 57600")
 	end
 	return currentport
+    end
 end
 
 function checkport()
-    local port = io.open(currentport, "w")
-    if not port then
-	print('port died, reconnecting...')
-	close()
-	connect()
-    else
-	io.close(port)
+    local result=false
+    if not simulate then
+	local port = io.open(currentport, "w")
+	if not port then
+	    print('Lost connection to port '.. currentport ..', reconnecting...')
+	    close()
+	    connect()
+	    write("l") --reload initial config
+	    result=true
+	else
+	    io.close(port)
+	end
     end
+    return result
 end
 
 function write(command, port, value)
@@ -74,8 +83,10 @@ function write(command, port, value)
 		outstring = command .. "\r"
 	end
 	if debug then print(outstring) end
-	wserial:write(outstring)
-	wserial:flush()
+	if not simulate then
+	    wserial:write(outstring)
+	    wserial:flush()
+	end
 	sleep(linetime)
 end
 
