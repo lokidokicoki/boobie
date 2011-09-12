@@ -1,5 +1,5 @@
 module(..., package.seeall)
-
+require 'log'
 local portdirection	={1,1,1,1,1,1,1,1,1,1,1,1}
 local portvalue	={0,0,0,0,0,0,0,0,0,0,0,0}
 local portconfiguration={}
@@ -11,7 +11,6 @@ local wserial = nil
 local rserial = nil
 
 local linetime = 0.2
-debug=false
 simulate=false
 
 -- ******************************************************************
@@ -34,25 +33,24 @@ function connect(specificport)
 	local counter=0
 
 	if specificport == nil then
-
-		while wserial == nil do
-			counter = counter + 1
-			wserial=io.open(serialports[counter],"w")
-			rserial=io.open(serialports[counter],"r")
-			if counter >= maxport then
-				counter = 0
-			end
+	    while wserial == nil do
+		counter = counter + 1
+		wserial=io.open(serialports[counter],"w")
+		rserial=io.open(serialports[counter],"r")
+		if counter >= maxport then
+		    counter = 0
 		end
-		currentport = serialports[counter]
+	    end
+	    currentport = serialports[counter]
 
-		if webmode == nil then
-			print("Using " .. currentport)
-		end
-		os.execute("stty -F " .. currentport .. " 57600")
+	    if webmode == nil then
+		log.info("Using " .. currentport)
+	    end
+	    os.execute("stty -F " .. currentport .. " 57600")
 	else
-		currentport=specificport
-		wserial=io.open(specificport,"w")
-		os.execute("stty -F " .. specificport .. " 57600")
+	    currentport=specificport
+	    wserial=io.open(specificport,"w")
+	    os.execute("stty -F " .. specificport .. " 57600")
 	end
 	return currentport
     end
@@ -63,10 +61,9 @@ function checkport()
     if not simulate then
 	local port = io.open(currentport, "w")
 	if not port then
-	    print('Lost connection to port '.. currentport ..', reconnecting...')
+	    log.warn('Lost connection to port '.. currentport ..', reconnecting...')
 	    close()
 	    connect()
-	    write("l") --reload initial config
 	    result=true
 	else
 	    io.close(port)
@@ -82,7 +79,7 @@ function write(command, port, value)
 	else
 		outstring = command .. "\r"
 	end
-	if debug then print(outstring) end
+	if log.DEBUG then print(outstring) end
 	if not simulate then
 	    wserial:write(outstring)
 	    wserial:flush()
@@ -91,24 +88,24 @@ function write(command, port, value)
 end
 
 function setport()
-	local i=0 
-	for i=4, 15 do
-		write("w", i, portvalue[i-3])
-		sleep(linetime)
-		write("c", i, portdirection[i-3])
-		sleep(linetime)
-	end
+    local i=0 
+    for i=4, 15 do
+	write("w", i, portvalue[i-3])
+	sleep(linetime)
+	write("c", i, portdirection[i-3])
+	sleep(linetime)
+    end
 end
 
 function close()
-	if wserial then wserial:close(); wserial=nil; end
-	if rserial then rserial:close(); rserial=nil; end
-	sleep(linetime)
+    if wserial then wserial:close(); wserial=nil; end
+    if rserial then rserial:close(); rserial=nil; end
+    sleep(linetime)
 end
 
 function setup()
-	setport()
-	write("s")
+    setport()
+    write("s")
 end
 --[[
 connect()

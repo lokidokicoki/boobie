@@ -1,5 +1,6 @@
+require 'log'
 require 'serial'
--- boobie has 7 leds
+-- boobie has 9 leds
 local max_leds=9
 local rate=1
 local samples=1
@@ -14,6 +15,16 @@ function sleep(n)
     os.execute("sleep "..tonumber(n))
 end
 
+function configure()
+    if wserial then
+	for i=1, max_leds, 1 do
+	    serial.write('c', active_pins[i], ON)
+	end
+    end
+    curr_leds=0
+    prev_leds=0
+end
+
 function process()
     os.execute("iostat -c "..rate.." ".. samples + 1 .." > /tmp/cpuidle");
     local count=0
@@ -21,12 +32,10 @@ function process()
     for line in io.lines("/tmp/cpuidle") do
 	count = count+1
 	if count == (7 + (3 * (samples-1)))  then
-	--print('count:'..count)
 	    local word_count =0
 	    for word in string.gmatch(line, "%d+%.?%d*") do 
 		word_count=word_count+1
 		if word_count == 6 then
-		    --print('word:'..word)
 		    idle=idle+word
 		end 
 	    end
@@ -36,15 +45,7 @@ function process()
     idle = 100-(idle/samples)
     curr_leds = math.ceil(math.floor((max_leds/100)*idle))
     if curr_leds ~= prev_leds then
-	--print('actual idle:'..idle..', curr_leds:'..curr_leds..', prev_leds:'..prev_leds)
-	--[[
-	for i=1,max_leds,1 do
-	    local pin = active_pins[i]
-	    local value = OFF --off
-	    if i <= curr_leds then value=ON end
-	    serial.write('w',pin,value)
-	end
-	]]
+	log.debug('actual idle:'..idle..', curr_leds:'..curr_leds..', prev_leds:'..prev_leds)
 	if curr_leds - prev_leds > 0 then
 	    -- turn on
 	    for i=prev_leds,curr_leds,1 do
@@ -73,6 +74,8 @@ function pulse(value)
 end
 
 function main()
+    log.open('cpuidle')
+
     if arg[1] ~= nil then
 	rate=arg[1]
     end
@@ -85,11 +88,10 @@ function main()
 	interval=arg[3]
     end
 
-    print("Settings: rate["..rate.."], samples["..samples.."], interval["..interval.."])")
+    log.info("Settings: rate["..rate.."], samples["..samples.."], interval["..interval.."])")
 
-    --serial.debug=true
-    --serial.simulate=true
     serial.connect()
+    configure()
     pulse(ON)
     pulse(OFF)
 
@@ -98,8 +100,7 @@ function main()
 	process()
 	sleep(interval)
 	if serial.checkport() then 
-	    curr_leds=0;
-	    prev_leds=0;
+	    configure()
 	end
 	if io.open("CPUIDLEPIPE", "r") ~= nil then 
 	    for line in io.lines("CPUIDLEPIPE") do 
@@ -111,7 +112,6 @@ function main()
     pulse(ON)
     pulse(OFF)
     serial.close()
-
 end
 
 function usage()
@@ -122,8 +122,20 @@ function usage()
     print("interval : number of second to wait before sampling again (default is 1)")
 end
 
-if arg[1] ~= nil and (arg[1] == "-h" or arg[1] == "--help") then 
+if arg[1] ~= nil then
+    if (arg[1] == "-h" or arg[1] == "--help") then 
 	usage()
-else
-	main() 
+	os.exit()
+    end
+
+    if (arg[1] == '-d' or arg[1] == '--debug') then
+	log.DEBUG=true
+	table.remove(arg, 1)
+    end
+    if (arg[1] == '-s' or arg[1] == '--sim') then
+	serial.simulate=true
+	table.remove(arg, 1)
+    end
 end
+
+main() 
