@@ -16,10 +16,8 @@ function sleep(n)
 end
 
 function configure()
-    if wserial then
-	for i=1, max_leds, 1 do
-	    serial.write('c', active_pins[i], ON)
-	end
+    for i=1, max_leds, 1 do
+	serial.write('c', active_pins[i], ON)
     end
     curr_leds=0
     prev_leds=0
