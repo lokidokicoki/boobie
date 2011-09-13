@@ -1,3 +1,5 @@
 #!/bin/bash
 
-lua cpuidle.lua &
+progname=$1
+shift
+lua $progname.lua "$@" &
