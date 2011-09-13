@@ -79,7 +79,7 @@ function write(command, port, value)
 	else
 		outstring = command .. "\r"
 	end
-	if log.DEBUG then print(outstring) end
+	log.debug('serial:write: '..outstring)
 	if not simulate then
 	    wserial:write(outstring)
 	    wserial:flush()
