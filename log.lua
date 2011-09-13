@@ -38,7 +38,7 @@ end
 function log(msg, is_error)
     -- output to file
     if log_file then
-	log_file:write(msg)
+	log_file:write(msg..'\n')
 	log_file:flush()
     end
 
