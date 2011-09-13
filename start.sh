@@ -2,4 +2,5 @@
 
 progname=$1
 shift
-lua $progname.lua "$@" &
+echo lua boobie.lua $progname "$@" &
+lua boobie.lua $progname "$@" &
