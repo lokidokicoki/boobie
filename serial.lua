@@ -10,7 +10,7 @@ local maxport= 9
 local wserial = nil
 local rserial = nil
 
-local linetime = 0.2
+local linetime = 0.005
 simulate=false
 
 -- ******************************************************************
