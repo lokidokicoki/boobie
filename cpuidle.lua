@@ -3,6 +3,7 @@ require 'log'
 require 'serial'
 -- boobie has 9 leds
 local rate=1
+local interval=0.1
 local samples=1
 local curr_leds=0
 local prev_leds=0
@@ -46,6 +47,7 @@ function process()
 	end
 	prev_leds=curr_leds
     end
+    sleep(interval)
 end
 
 function main()

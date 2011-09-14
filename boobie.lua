@@ -4,7 +4,6 @@ require 'serial'
 active_pins={4,5,9,10,11,12,13,14,15}
 ON = 1
 OFF = 0
-interval=0.1
 local mod=nil
 local mod_name=nil
 
@@ -51,7 +50,6 @@ function main()
     local loop=true 
     while(loop) do
 	process()
-	sleep(interval)
 	if serial.checkport() then 
 	    configure()
 	end
