@@ -1,7 +1,7 @@
 module('stress', package.seeall)
 require 'log'
 require 'serial'
-local sleepy_times={1,5,10,5,1}
+local sleepy_times={1,5,10,20}
 local patterns={
     {1,3,5,7,9},
     {2,4,6,8},
