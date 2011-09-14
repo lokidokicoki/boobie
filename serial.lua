@@ -46,7 +46,10 @@ function connect(specificport)
 	    if webmode == nil then
 		log.info("Using " .. currentport)
 	    end
-	    os.execute("stty -F " .. currentport .. " 57600")
+	    if os.execute("stty -F " .. currentport .. " 57600") ~= 0 then
+		log.err('could not access port: '..currentport..'\nExiting')
+		os.exit()
+	    end
 	else
 	    currentport=specificport
 	    wserial=io.open(specificport,"w")
