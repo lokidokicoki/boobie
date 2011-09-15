@@ -50,19 +50,31 @@ function process()
     sleep(interval)
 end
 
-function main()
-    log.open('cpuidle')
+function usage()
+    print("Usage: start.sh cpuidle [-h|[options]]")
+    print("Monitor the CPU idle percentage over a given time frame and display on boobie board.")
+    print("-h|--help : print this message and exit")
+    print("1st option : number of seconds between samples, default 1 sec")
+    print("2nd option : number of samples to take, 2")
+    print("3rd option : interval between sample iterations, 0.1 seconds")
+end
 
-    if arg[1] ~= nil then
+function setup(args)
+    if arg[1] ~= nil and (arg[1] == "-h" or arg[1] == "--help") then 
+	usage()
+	os.exit()
+    end
+
+    if args[1] ~= nil then
 	rate=arg[1]
     end
 
-    if arg[2] ~= nil then
-	samples=arg[2]
+    if args[2] ~= nil then
+	samples=args[2]
     end
 
-    if arg[3] ~= nil then
-	interval=arg[3]
+    if args[3] ~= nil then
+	interval=args[3]
     end
 
 end

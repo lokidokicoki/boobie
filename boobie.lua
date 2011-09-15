@@ -66,7 +66,14 @@ function main()
 end
 
 function usage()
-    print("Usage: lua boobie.lua [options] MODULE")
+    print("Usage: start.sh [-h|-d|-s] MODULE")
+    print("Harness for Archnonix Boobie Board modules.")
+    print("Can either be run via the `start.sh` script or invoked thusly:")
+    print("lua boobie.lua [options] MODULE [options]")
+    print("-h|--help : print this message and exit")
+    print("-d|--debug : enable debug output")
+    print("-s|--sim : simulate connection to boobie board")
+    print("MODULE : e.g. cpuidle")
 end
 
 if arg[1] ~= nil then
@@ -86,6 +93,11 @@ if arg[1] ~= nil then
 
     mod_name=arg[1]
     mod=require(mod_name)
+    table.remove(arg,1)
+    mod.setup(arg)
+else
+    usage()
+    os.exit()
 end
 
 main() 
