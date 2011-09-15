@@ -1,6 +1,7 @@
 #!/bin/bash
 
 progname=$1
+progname=${progname%.lua}
 shift
 echo lua boobie.lua $progname "$@" &
 lua boobie.lua $progname "$@" &
