@@ -3,14 +3,76 @@ Archonix Boobie Board Toys
 
 Lua-based hardware controller for the Archonix Boobie Board.
 
-- CPU idle monitor (cpuidle.lua)
--
-
 Platform:
-- Built on Ubuntu 11.04
+=========
+- Built on Ubuntu 11.04, but any flavor of Linux will do.
+- Doesn't work with Windows yet due to calls made in `serial.lua`
 
 Requires:
+=========
 - Boobie Board - available from www.archonix.co.uk
 - lua
-- systat
+- sysstat
 - a good editor, vi is *always* the right weapon of choice.
+
+Installation:
+=============
+- git clone git@github.com:lokidokicoki/boobie.git 
+
+Usage (tl;dr version):
+======================
+- cd boobie
+- start cpudidle
+- stop
+
+For those who like reading:
+===========================
+Archonix Ltd. make a small PIC-based hardware interface called a Boobie board.
+To help people get to grips with it (myself included) I wrote this harness to 
+talk to the board. 
+
+Along with the harness, there are a couple of example scripts that play with 
+the outputs of the Boobie board. 
+
+To make life easier, there is a shell script called 'start' that runs the outer
+'boobie' harness and a sub-module.
+
+If the name of a sub-module is not provided, a usage message will be displayed.
+
+The example scripts are:
+- cpuidle.lua: monitors the CPU idle percentage and displays it as a number of 
+lit LEDs on the Boobie
+- stress.lua: a simple stress test and burn-in module that runs a variety of
+'light shows' on the Boobie.
+
+Extensions:
+===========
+- sudo apt-get install luadoc
+- cd boobie
+- luadoc -d docs *
+
+The luadocs (or just reading the code) shows that the structure is pretty 
+simple, and in general, the harness will run any lua module that provides 
+the following functions:
+
+- function setup(args)
+ = args is a table
+
+- function configure()
+ = resets any tracking state if connectivity with the Boobie board is lost and 
+reconnection is successful
+
+- function process()
+ = what you want the board to do, that goes here :)
+
+- function usage()
+ = help messages
+
+The module should also do the following:
+module('MODNAME', package.seeall)
+require 'serial'
+require 'log'
+
+MODNAME is obviously the name of your new module.
+log.lua 
+serial.lua 
