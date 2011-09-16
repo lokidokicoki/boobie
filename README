@@ -69,10 +69,7 @@ reconnection is successful
  = help messages
 
 The module should also do the following:
-module('MODNAME', package.seeall)
-require 'serial'
-require 'log'
+module('MODNAME', package.seeall) -- MODNAME is your module name
+require 'serial' -- access to the serail interface
+require 'log' -- acces to the log file handler
 
-MODNAME is obviously the name of your new module.
-log.lua 
-serial.lua 
