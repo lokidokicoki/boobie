@@ -1,3 +1,5 @@
+--- Simple stress test and burn-in module that runs a variety of
+-- 'light shows' on the Boobie.
 module('stress', package.seeall)
 require 'log'
 require 'serial'
@@ -10,10 +12,12 @@ local patterns={
     {9,8,7,6,5,4,3,2,1},
 }
 
+--- (Re)set any state.
 function configure()
     --blank
 end
 
+--- Loop over patterns and dispaly them for increasing amounts of time.
 function process()
     -- various stress test patterns
     for i,hold in pairs(sleepy_times) do
@@ -29,12 +33,14 @@ function process()
     end
 end
 
+--- Print sub-module usage message
 function usage()
     print("Usage: start.sh stress [-h]")
     print("Run through a variety of patterns and hold times for testing.")
     print("-h|--help : print this message and exit")
 end
 
+--- Handle args
 function setup(args)
     if arg[1] ~= nil and (arg[1] == "-h" or arg[1] == "--help") then 
 	usage()

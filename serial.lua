@@ -1,3 +1,4 @@
+--- Serail interface for Archonix Boobie boards
 module(..., package.seeall)
 require 'log'
 local portdirection	={1,1,1,1,1,1,1,1,1,1,1,1}
@@ -27,6 +28,9 @@ else
 end
 ]]
 
+--- Connect to serail port.
+-- @param specificport if nil, then loop over valid prots and see fi there is a Boobie attached.
+-- @return connected port
 function connect(specificport)
     if not simulate then
 	local received = nil
@@ -59,6 +63,8 @@ function connect(specificport)
     end
 end
 
+--- Check if the serail port is still 'alive'
+-- @return true for alive
 function checkport()
     local result=false
     if not simulate then
@@ -75,6 +81,10 @@ function checkport()
     return result
 end
 
+--- Issue command to a port with a given value.
+-- @param command one of 'w', 'c', 's', 'r'
+-- @param port I/O pin on Boobie board
+-- @param value only applies to 'w'
 function write(command, port, value)
 	local outstring = ""
 	if port~=nil then
@@ -100,6 +110,7 @@ function setport()
     end
 end
 
+--- Close serial connections
 function close()
     if wserial then wserial:close(); wserial=nil; end
     if rserial then rserial:close(); rserial=nil; end

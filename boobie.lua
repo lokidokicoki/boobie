@@ -1,3 +1,4 @@
+--- Harness for Archinix Boobie Board.
 require 'log'
 require 'serial'
 -- boobie has 9 leds
@@ -7,10 +8,12 @@ OFF = 0
 local mod=nil
 local mod_name=nil
 
+--- Calls native sleep function.
 function sleep(n)
     os.execute("sleep "..tonumber(n))
 end
 
+--- Override (but do not save) Boobie board pin configuration
 function configure()
     for i=1, #active_pins, 1 do
 	serial.write('c', active_pins[i], ON)
@@ -21,12 +24,15 @@ function configure()
     end
 end
 
+--- Call sub-module process code
 function process()
     if mod then
 	mod.process()
     end
 end
 
+--- Flash all the active output pins.
+-- @param value ON/OFF
 function pulse(value)
     if value == ON then
 	for i=1,#active_pins,1 do
@@ -39,6 +45,9 @@ function pulse(value)
     end
 end
 
+--- Main loop to process sub-module code and check if the harness should exit.
+-- Connect and cofngiure Boobie board.
+-- Each time round loop, check value of fifo BOOBIE_PIPE.
 function main()
     log.open('boobie_'..mod_name)
 
@@ -65,6 +74,7 @@ function main()
     serial.close()
 end
 
+--- Print help message.
 function usage()
     print("Usage: start.sh [-h|-d|-s] MODULE")
     print("Harness for Archnonix Boobie Board modules.")
@@ -76,6 +86,7 @@ function usage()
     print("MODULE : e.g. cpuidle")
 end
 
+-- handle input args
 if arg[1] ~= nil then
     if (arg[1] == "-h" or arg[1] == "--help") then 
 	usage()

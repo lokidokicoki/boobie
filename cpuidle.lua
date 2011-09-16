@@ -1,3 +1,4 @@
+--- Use iostat (from sysstat package) to get/display CPU idle percentage.
 module('cpuidle', package.seeall)
 require 'log'
 require 'serial'
@@ -8,11 +9,13 @@ local samples=1
 local curr_leds=0
 local prev_leds=0
 
+--- (Re)set LEDs count trackers
 function configure()
     curr_leds=0
     prev_leds=0
 end
 
+--- Call iostat, read CPU idle %, calc number of LED to display, write value to Boobie board.
 function process()
     os.execute("iostat -c "..rate.." ".. samples + 1 .." > /tmp/cpuidle");
     local count=0
@@ -50,6 +53,7 @@ function process()
     sleep(interval)
 end
 
+--- Print sub-module usage message
 function usage()
     print("Usage: start.sh cpuidle [-h|[options]]")
     print("Monitor the CPU idle percentage over a given time frame and display on boobie board.")
@@ -59,6 +63,7 @@ function usage()
     print("3rd option : interval between sample iterations, 0.1 seconds")
 end
 
+--- Handle args
 function setup(args)
     if arg[1] ~= nil and (arg[1] == "-h" or arg[1] == "--help") then 
 	usage()
@@ -76,5 +81,4 @@ function setup(args)
     if args[3] ~= nil then
 	interval=args[3]
     end
-
 end
