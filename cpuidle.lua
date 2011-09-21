@@ -11,6 +11,9 @@ local prev_leds=0
 
 --- (Re)set LEDs count trackers
 function configure()
+    for i=1, #active_pins, 1 do
+	serial.write('w', active_pins[i], OFF)
+    end
     curr_leds=0
     prev_leds=0
 end
