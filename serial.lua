@@ -88,7 +88,10 @@ end
 function write(command, port, value)
 	local outstring = ""
 	if port~=nil then
-		outstring = command .. string.format("%02d", port) .. value .. "\r"
+		outstring = command .. string.format("%02d", port)
+		if command ~= 'r' then
+		    outstring = outstring .. value .. "\r"
+		end
 	else
 		outstring = command .. "\r"
 	end
@@ -98,6 +101,20 @@ function write(command, port, value)
 	    wserial:flush()
 	end
 	sleep(linetime)
+end
+
+function read(pin)
+    local result=nil
+    rserial:seek('end')
+    if pin ~= nil then
+	write('r', pin)
+    end
+    if not simulate then
+	result = rserial:read()
+	log.debug('result: '..result)
+    end
+    sleep(linetime)
+    return result
 end
 
 function setport()

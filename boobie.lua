@@ -5,6 +5,8 @@ require 'serial'
 active_pins={4,5,9,10,11,12,13,14,15}
 ON = 1
 OFF = 0
+INPUT=0
+OUTPUT=1
 local mod=nil
 local mod_name=nil
 
@@ -16,7 +18,7 @@ end
 --- Override (but do not save) Boobie board pin configuration
 function configure()
     for i=1, #active_pins, 1 do
-	serial.write('c', active_pins[i], ON)
+	serial.write('c', active_pins[i], OUTPUT)
     end
 
     if mod then
