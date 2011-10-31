@@ -14,6 +14,8 @@ local rserial = nil
 local linetime = 0.005
 simulate=false
 
+local read_buffer=nil
+
 -- ******************************************************************
 
 --[[
@@ -63,7 +65,7 @@ function connect(specificport)
     end
 end
 
---- Check if the serail port is still 'alive'
+--- Check if the serial port is still 'alive'
 -- @return true for alive
 function checkport()
     local result=false
@@ -99,19 +101,21 @@ function write(command, port, value)
 	if not simulate then
 	    wserial:write(outstring)
 	    wserial:flush()
+	    -- synch read
+	    read_buffer = rserial:read()
 	end
 	sleep(linetime)
 end
 
-function read(pin)
-    local result=nil
-    rserial:seek('end')
-    if pin ~= nil then
-	write('r', pin)
-    end
+function interrupt(pin)
+    local result=0
     if not simulate then
-	result = rserial:read()
-	log.debug('result: '..result)
+	read_buffer = rserial:read()
+	log.debug('serial:read: '..read_buffer)
+	if string.find(read_buffer, 'Int: '.. pin ..' low') then
+	    log.debug('button pressed')
+	    result = 1
+	end
     end
     sleep(linetime)
     return result
