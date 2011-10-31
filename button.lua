@@ -31,23 +31,29 @@ function process()
         serial.write('w', active_pins[pin], OFF)
     end
     serial.write('c', BUTTON, INPUT)
+    serial.write('i', BUTTON, ON)
+    sleep(hold)
 
     local result = nil
-    for i=1,100 do
-	result = serial.read(BUTTON)
+    local _loop = true
+    while _loop do 
+	result = serial.interrupt(BUTTON)
 	if result == 1 then
 	    mode = mode+1
+	    if mode > #patterns then mode = 1 end
+	    _loop=false
 	    break
 	end
-	sleep(hold)
+	log.debug('button:loop')
     end
 
+    serial.write('i', BUTTON, OFF)
     serial.write('c', BUTTON, OUTPUT)
 end
 
 --- Print sub-module usage message
 function usage()
-    print("Usage: start.sh stress [-h]")
+    print("Usage: start.sh button [-h]")
     print("Run through a variety of patterns and hold times for testing.")
     print("-h|--help : print this message and exit")
 end
