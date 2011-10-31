@@ -1,9 +1,8 @@
---- Simple stress test and burn-in module that runs a variety of
--- 'light shows' on the Boobie.
+--- Use the interrupt mechanism to swtich between light patterns
 module('button', package.seeall)
 require 'log'
 require 'serial'
-local BUTTON=15
+local BUTTON_PIN=15
 local sleepy_times={1,5,10,20}
 local patterns={
     {1,3,5,7,9},
@@ -20,7 +19,8 @@ function configure()
     mode=1
 end
 
---- Loop over patterns and dispaly them for increasing amounts of time.
+--- 'Listen' for an interrupt, advance to next mode when we get one.
+-- If we run off the end, then start again.
 function process()
     local pattern = patterns[mode]
     for k, pin in pairs(pattern) do
@@ -30,14 +30,14 @@ function process()
     for k, pin in pairs(pattern) do
         serial.write('w', active_pins[pin], OFF)
     end
-    serial.write('c', BUTTON, INPUT)
-    serial.write('i', BUTTON, ON)
+    serial.write('c', BUTTON_PIN, INPUT)
+    serial.write('i', BUTTON_PIN, ON)
     sleep(hold)
 
     local result = nil
     local _loop = true
     while _loop do 
-	result = serial.interrupt(BUTTON)
+	result = serial.interrupt(BUTTON_PIN)
 	if result == 1 then
 	    mode = mode+1
 	    if mode > #patterns then mode = 1 end
@@ -47,14 +47,15 @@ function process()
 	log.debug('button:loop')
     end
 
-    serial.write('i', BUTTON, OFF)
-    serial.write('c', BUTTON, OUTPUT)
+    serial.write('i', BUTTON_PIN, OFF)
+    serial.write('c', BUTTON_PIN, OUTPUT)
 end
 
 --- Print sub-module usage message
 function usage()
     print("Usage: start.sh button [-h]")
-    print("Run through a variety of patterns and hold times for testing.")
+    print("Switch through various light patterns using the intterupt mechanism.")
+    print("Requires Archonix Boobie firmware v1.3")
     print("-h|--help : print this message and exit")
 end
 
