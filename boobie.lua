@@ -90,21 +90,26 @@ end
 
 -- handle input args
 if arg[1] ~= nil then
-    if (arg[1] == "-h" or arg[1] == "--help") then 
-	usage()
-	os.exit()
-    end
-
-    if (arg[1] == '-d' or arg[1] == '--debug') then
-	log.DEBUG=true
-	table.remove(arg, 1)
-    end
-    if (arg[1] == '-s' or arg[1] == '--sim') then
-	serial.simulate=true
-	table.remove(arg, 1)
+    local scan_args = true
+    while scan_args do
+	if (arg[1] == "-h" or arg[1] == "--help") then 
+	    usage()
+	    os.exit()
+	elseif (arg[1] == '-d' or arg[1] == '--debug') then
+	    log.DEBUG=true
+	    table.remove(arg, 1)
+	elseif (arg[1] == '-s' or arg[1] == '--sim') then
+	    serial.simulate=true
+	    table.remove(arg, 1)
+	else 
+	    scan_args=false
+	end
     end
 
     mod_name=arg[1]
+
+    mod_name = string.gsub(mod_name, '.lua', '')
+
     mod=require(mod_name)
     table.remove(arg,1)
     mod.setup(arg)
